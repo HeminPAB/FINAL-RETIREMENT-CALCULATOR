@@ -63,6 +63,24 @@ const IncomeGoalsStep = ({ formData, updateFormData, onNext, onPrev, isCalculati
     return value ? `${value}%` : '0%';
   };
 
+  // Format number with commas
+  const formatNumberWithCommas = (value) => {
+    if (!value) return '';
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // Remove commas from input
+  const removeCommas = (value) => {
+    return value.replace(/,/g, '');
+  };
+
+  // Handle currency input formatting
+  const handleCurrencyInput = (value, updateFunction) => {
+    const cleanValue = removeCommas(value);
+    const numericValue = parseFloat(cleanValue) || 0;
+    updateFunction(numericValue);
+  };
+
   const getEducationalContent = (type) => {
     const content = {
       cpp: {
@@ -330,7 +348,7 @@ const IncomeGoalsStep = ({ formData, updateFormData, onNext, onPrev, isCalculati
               <div className="absolute inset-0 bg-white border-2 border-cyan-500 rounded-lg p-4 flex flex-col justify-center items-center">
                 <div className="relative w-full max-w-20">
                   <input
-                    type="number"
+                    type="text"
                     value={customRatioInput}
                     onChange={(e) => setCustomRatioInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -341,7 +359,7 @@ const IncomeGoalsStep = ({ formData, updateFormData, onNext, onPrev, isCalculati
                       }
                     }}
                     onBlur={handleCustomRatioSave}
-                    className="w-full text-center text-lg font-bold border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="w-full text-center text-lg font-bold border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     min="10"
                     max="110"
                     autoFocus
@@ -482,10 +500,10 @@ const IncomeGoalsStep = ({ formData, updateFormData, onNext, onPrev, isCalculati
                            Number of children
                          </label>
                          <input
-                           type="number"
+                           type="text"
                            value={formData.numberOfChildren || ''}
                            onChange={(e) => handleInputChange('numberOfChildren', parseInt(e.target.value) || 0)}
-                           className="w-full p-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-cyan-500"
+                           className="w-full p-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-cyan-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                            min="0"
                            placeholder="2"
                          />
@@ -495,10 +513,10 @@ const IncomeGoalsStep = ({ formData, updateFormData, onNext, onPrev, isCalculati
                            Youngest child's age
                          </label>
                          <input
-                           type="number"
+                           type="text"
                            value={formData.youngestChildAge || ''}
                            onChange={(e) => handleInputChange('youngestChildAge', parseInt(e.target.value) || 0)}
-                           className="w-full p-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-cyan-500"
+                           className="w-full p-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-cyan-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                            min="0"
                            max="25"
                            placeholder="5"
@@ -598,10 +616,10 @@ const IncomeGoalsStep = ({ formData, updateFormData, onNext, onPrev, isCalculati
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                   <input
-                    type="number"
-                    value={formData.totalDebt || ''}
-                    onChange={(e) => handleInputChange('totalDebt', parseFloat(e.target.value) || 0)}
-                    className="w-full pl-8 pr-3 py-3 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-cyan-500"
+                    type="text"
+                    value={formData.totalDebt ? formatNumberWithCommas(formData.totalDebt.toString()) : ''}
+                    onChange={(e) => handleCurrencyInput(e.target.value, (value) => handleInputChange('totalDebt', value))}
+                    className="w-full pl-8 pr-3 py-3 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-cyan-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     placeholder="150,000"
                     min="0"
                   />

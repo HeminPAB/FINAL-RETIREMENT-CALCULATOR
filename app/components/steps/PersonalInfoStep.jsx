@@ -11,6 +11,24 @@ const PersonalInfoStep = ({ formData, updateFormData, onNext, onPrev }) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
+  // Format number with commas
+  const formatNumberWithCommas = (value) => {
+    if (!value) return '';
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // Remove commas from input
+  const removeCommas = (value) => {
+    return value.replace(/,/g, '');
+  };
+
+  // Handle currency input formatting
+  const handleCurrencyInput = (value, updateFunction) => {
+    const cleanValue = removeCommas(value);
+    const numericValue = parseFloat(cleanValue) || 0;
+    updateFunction(numericValue);
+  };
+
   const provinces = [
     'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador',
     'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island',
@@ -32,8 +50,8 @@ const PersonalInfoStep = ({ formData, updateFormData, onNext, onPrev }) => {
         <label className="block">
           <p className="text-foreground text-base font-medium mb-2">Current Age</p>
           <input
-            type="number"
-            className="w-full bg-white border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+            type="text"
+            className="w-full bg-white border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             value={formData.currentAge}
             onChange={(e) => handleInputChange('currentAge', parseInt(e.target.value) || 0)}
             min="18"
@@ -88,8 +106,8 @@ const PersonalInfoStep = ({ formData, updateFormData, onNext, onPrev }) => {
         <label className="block">
           <p className="text-foreground text-base font-medium mb-2">Planned Retirement Age</p>
           <input
-            type="number"
-            className="w-full bg-white border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+            type="text"
+            className="w-full bg-white border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             value={formData.retirementAge}
             onChange={(e) => handleInputChange('retirementAge', parseInt(e.target.value) || 0)}
             min={formData.currentAge + 1}
@@ -214,14 +232,16 @@ const PersonalInfoStep = ({ formData, updateFormData, onNext, onPrev }) => {
                 </div>
               </div>
             </div>
-            <input
-              type="number"
-              placeholder="$65,000"
-              className="w-full bg-white border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-              value={formData.annualIncome || ''}
-              onChange={(e) => handleInputChange('annualIncome', parseFloat(e.target.value) || 0)}
-              min="0"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+              <input
+                type="text"
+                placeholder="65,000"
+                className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={formData.annualIncome ? formatNumberWithCommas(formData.annualIncome.toString()) : ''}
+                onChange={(e) => handleCurrencyInput(e.target.value, (value) => handleInputChange('annualIncome', value))}
+              />
+            </div>
           </label>
         </div>
 
@@ -231,9 +251,9 @@ const PersonalInfoStep = ({ formData, updateFormData, onNext, onPrev }) => {
             <p className="text-foreground text-base font-medium mb-2">Expected Annual Income Increase</p>
             <div className="relative">
               <input
-                type="number"
+                type="text"
                 placeholder="2.1"
-                className="w-full bg-white border border-border rounded-lg px-4 py-3 pr-8 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+                className="w-full bg-white border border-border rounded-lg px-4 py-3 pr-8 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 value={formData.incomeGrowthRate ? formData.incomeGrowthRate * 100 : ''}
                 onChange={(e) => handleInputChange('incomeGrowthRate', (parseFloat(e.target.value) || 0) / 100)}
                 min="0"
@@ -251,41 +271,43 @@ const PersonalInfoStep = ({ formData, updateFormData, onNext, onPrev }) => {
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>
-            {expandedSection === 'incomeGrowthRate' && (
-              <div className="mt-3 p-6 bg-white rounded-lg border border-gray-200">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Income Growth Expectations</h3>
-                
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-700">Historical average: Canadian wages grow 2-3% annually</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-700">Career stage: Early career often sees higher growth rates</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-700">Industry factors: Tech and healthcare typically above average</p>
-                  </div>
-                </div>
-
-                <div className="bg-pink-50 border-l-4 border-pink-400 p-4 rounded-r-lg">
-                  <div className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-pink-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 12a9.972 9.972 0 01-1.929 5.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 12a7.971 7.971 0 00-1.343-4.243 1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                    <div>
-                      <p className="text-pink-700 font-semibold">Quick Tip:</p>
-                      <p className="text-pink-700 mt-1">Be conservative in your estimate. It's better to exceed expectations than fall short of retirement goals.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </label>
         </div>
       </div>
+
+      {/* Income Growth Learn More - Full Width */}
+      {expandedSection === 'incomeGrowthRate' && (
+        <div className="mt-3 p-6 bg-white rounded-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Income Growth Expectations</h3>
+          
+          <div className="space-y-3 mb-4">
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-gray-700">Historical average: Canadian wages grow 2-3% annually</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-gray-700">Career stage: Early career often sees higher growth rates</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-gray-700">Industry factors: Tech and healthcare typically above average</p>
+            </div>
+          </div>
+
+          <div className="bg-pink-50 border-l-4 border-pink-400 p-4 rounded-r-lg">
+            <div className="flex items-start gap-2">
+              <svg className="w-5 h-5 text-pink-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 12a9.972 9.972 0 01-1.929 5.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 12a7.971 7.971 0 00-1.343-4.243 1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <p className="text-pink-700 font-semibold">Quick Tip:</p>
+                <p className="text-pink-700 mt-1">Be conservative in your estimate. It's better to exceed expectations than fall short of retirement goals.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Marital Status */}
       <div>

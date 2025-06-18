@@ -24,29 +24,29 @@ const STEP_TITLES = {
 
 const initialFormData = {
   // Personal Info
-  currentAge: 27,
-  retirementAge: 65,
+  currentAge: 0,
+  retirementAge: 0,
   yearsInRetirement: 25,
-  province: 'ON',
-  maritalStatus: 'single',
-  annualIncome: 65000,
+  province: '',
+  maritalStatus: '',
+  annualIncome: 0,
   incomeGrowthRate: 0.021,
   
   // Current Savings - new array structure
   savings: [{ type: '', amount: 0, id: Date.now() }],
   monthlyContributions: [{ type: '', amount: 0, id: Date.now() }],
   
-  // Government Benefits
+  // Government Benefits - Keep CPP and OAS as requested
   cppBenefit: 1433,
-  oasBenefit: 727.67,
+  oasBenefit: 728,
   
   // Income & Goals
-  currentIncome: 65000,
-  expectedReturnType: 'balanced', // conservative, balanced, growth
-  retirementLifestyle: 'comfortable', // basic, comfortable, luxury, ultra-luxury
-  monthlyContribution: 500,
-  savingsRate: 7,
-  incomeReplacementRatio: 0.8, // 80% as decimal (matches the IncomeGoalsStep format)
+  currentIncome: 0,
+  expectedReturnType: '', // conservative, balanced, growth
+  retirementLifestyle: '', // basic, comfortable, luxury, ultra-luxury
+  monthlyContribution: 0,
+  savingsRate: 0,
+  incomeReplacementRatio: 0, // Reset to 0
   
   // Calculated fields
   preRetirementReturn: 0.07,
@@ -69,6 +69,24 @@ export default function HomePage() {
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = useState(false);
   const [isEditingCurrentSavings, setIsEditingCurrentSavings] = useState(false);
   const [isEditingIncomeGoals, setIsEditingIncomeGoals] = useState(false);
+
+  // Format number with commas
+  const formatNumberWithCommas = (value) => {
+    if (!value) return '';
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // Remove commas from input
+  const removeCommas = (value) => {
+    return value.replace(/,/g, '');
+  };
+
+  // Handle currency input formatting
+  const handleCurrencyInput = (value, updateFunction) => {
+    const cleanValue = removeCommas(value);
+    const numericValue = parseFloat(cleanValue) || 0;
+    updateFunction(numericValue);
+  };
 
   const updateFormData = (newData) => {
     setFormData(prev => ({ ...prev, ...newData }));
@@ -376,10 +394,10 @@ export default function HomePage() {
                       <span className="text-gray-600 flex-shrink-0">Current Age:</span>
                       {isEditingPersonalInfo ? (
                         <input
-                          type="number"
+                          type="text"
                           value={formData.currentAge || ''}
                           onChange={(e) => updateFormData({ currentAge: parseInt(e.target.value) || 0 })}
-                          className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white"
+                          className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           min="18"
                           max="100"
                         />
@@ -393,10 +411,10 @@ export default function HomePage() {
                       <span className="text-gray-600 flex-shrink-0">Retirement Age:</span>
                       {isEditingPersonalInfo ? (
                         <input
-                          type="number"
+                          type="text"
                           value={formData.retirementAge || ''}
                           onChange={(e) => updateFormData({ retirementAge: parseInt(e.target.value) || 0 })}
-                          className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white"
+                          className="w-20 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           min={formData.currentAge + 1}
                           max="75"
                         />
@@ -409,13 +427,16 @@ export default function HomePage() {
                     <div className="flex justify-between items-center min-h-[32px]">
                       <span className="text-gray-600 flex-shrink-0">Annual Income:</span>
                       {isEditingPersonalInfo ? (
-                        <input
-                          type="number"
-                          value={formData.annualIncome || ''}
-                          onChange={(e) => updateFormData({ annualIncome: parseInt(e.target.value) || 0 })}
-                          className="w-24 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white"
-                          min="0"
-                        />
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">$</span>
+                          <input
+                            type="text"
+                            value={formData.annualIncome ? formatNumberWithCommas(formData.annualIncome.toString()) : ''}
+                            onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ annualIncome: value }))}
+                            className="w-28 pl-5 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            min="0"
+                          />
+                        </div>
                       ) : (
                         <span className="font-medium text-gray-900">
                           {formData.annualIncome ? `$${formData.annualIncome.toLocaleString()}` : '-'}

@@ -104,7 +104,7 @@ const ResultsStep = ({ results, formData, onPrev, onStartOver }) => {
   const sustainabilityRate = Math.min(100, Math.max(0, (monthlyIncomeFromSavings / netRequiredMonthlyWithdrawal) * 100));
   
   // Function to handle PDF generation
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const calculations = {
       currentAge,
       retirementAge,
@@ -122,7 +122,12 @@ const ResultsStep = ({ results, formData, onPrev, onStartOver }) => {
       monthlyIncomeFromSavings
     };
     
-    generateRetirementReport(formData, calculations);
+    try {
+      await generateRetirementReport(formData, calculations);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
   };
 
   return (

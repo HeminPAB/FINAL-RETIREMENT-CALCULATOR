@@ -50,6 +50,24 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
     }).format(value);
   };
 
+  // Format number with commas
+  const formatNumberWithCommas = (value) => {
+    if (!value) return '';
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // Remove commas from input
+  const removeCommas = (value) => {
+    return value.replace(/,/g, '');
+  };
+
+  // Handle currency input formatting
+  const handleCurrencyInput = (value, updateFunction) => {
+    const cleanValue = removeCommas(value);
+    const numericValue = parseFloat(cleanValue) || 0;
+    updateFunction(numericValue);
+  };
+
   const totalSavings = savings.reduce((total, entry) => {
     const amount = parseFloat(entry.amount) || 0;
     return total + amount;
@@ -129,14 +147,16 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
             <div className="flex-1">
               <label className="block">
                 <p className="text-foreground text-base font-medium mb-2">Current Balance</p>
-                <input
-                  type="number"
-                  placeholder="$0"
-                  className="w-full bg-white border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-                  value={entry.amount || ''}
-                  onChange={(e) => updateSavingsEntry(entry.id, 'amount', parseFloat(e.target.value) || 0)}
-                  min="0"
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                  <input
+                    type="text"
+                    placeholder="0"
+                    className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={entry.amount ? formatNumberWithCommas(entry.amount.toString()) : ''}
+                    onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateSavingsEntry(entry.id, 'amount', value))}
+                  />
+                </div>
               </label>
             </div>
 
@@ -283,12 +303,11 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
                 <input
-                  type="number"
+                  type="text"
                   placeholder=""
-                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-                  value={formData.monthlyTfsa || ''}
-                  onChange={(e) => updateFormData({ monthlyTfsa: parseFloat(e.target.value) || 0 })}
-                  min="0"
+                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  value={formData.monthlyTfsa ? formatNumberWithCommas(formData.monthlyTfsa.toString()) : ''}
+                  onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ monthlyTfsa: value }))}
                 />
               </div>
             </label>
@@ -301,12 +320,11 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
                 <input
-                  type="number"
+                  type="text"
                   placeholder=""
-                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-                  value={formData.monthlyRrsp || ''}
-                  onChange={(e) => updateFormData({ monthlyRrsp: parseFloat(e.target.value) || 0 })}
-                  min="0"
+                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  value={formData.monthlyRrsp ? formatNumberWithCommas(formData.monthlyRrsp.toString()) : ''}
+                  onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ monthlyRrsp: value }))}
                 />
               </div>
             </label>
@@ -319,12 +337,11 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
                 <input
-                  type="number"
+                  type="text"
                   placeholder=""
-                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-                  value={formData.monthlyOtherRegistered || ''}
-                  onChange={(e) => updateFormData({ monthlyOtherRegistered: parseFloat(e.target.value) || 0 })}
-                  min="0"
+                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  value={formData.monthlyOtherRegistered ? formatNumberWithCommas(formData.monthlyOtherRegistered.toString()) : ''}
+                  onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ monthlyOtherRegistered: value }))}
                 />
               </div>
             </label>
@@ -337,12 +354,11 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
                 <input
-                  type="number"
+                  type="text"
                   placeholder=""
-                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-                  value={formData.monthlyNonRegistered || ''}
-                  onChange={(e) => updateFormData({ monthlyNonRegistered: parseFloat(e.target.value) || 0 })}
-                  min="0"
+                  className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  value={formData.monthlyNonRegistered ? formatNumberWithCommas(formData.monthlyNonRegistered.toString()) : ''}
+                  onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ monthlyNonRegistered: value }))}
                 />
               </div>
             </label>
@@ -363,20 +379,24 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
                 <svg className="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  Include other sources of income such as rental income, royalties, dividends, business income, annuities, part-time work, or other passive income
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 w-80 max-w-sm">
+                  <div className="text-center">
+                    Include other sources of income such as rental income, royalties, dividends, business income, annuities, part-time work, or other passive income
+                  </div>
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
             </div>
-            <input
-              type="number"
-              placeholder="e.g. 500"
-              className="w-full bg-white border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-              value={formData.otherIncome || ''}
-              onChange={(e) => updateFormData({ otherIncome: parseFloat(e.target.value) || 0 })}
-              min="0"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+              <input
+                type="text"
+                placeholder="500"
+                className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={formData.otherIncome ? formatNumberWithCommas(formData.otherIncome.toString()) : ''}
+                onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ otherIncome: value }))}
+              />
+            </div>
           </label>
         </div>
 
@@ -384,14 +404,19 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
         <div className="mb-3">
           <label className="block">
             <p className="text-foreground text-base font-medium mb-2">Canada Pension Plan (CPP) - Monthly</p>
-            <input
-              type="number"
-              placeholder="$1,433"
-              className="w-full bg-white border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-              value={formData.cppBenefit || 1433}
-              onChange={(e) => updateFormData({ cppBenefit: parseFloat(e.target.value) || 1433 })}
-              min="0"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+              <input
+                type="text"
+                placeholder="1,433"
+                className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={formData.cppBenefit ? formatNumberWithCommas(formData.cppBenefit.toString()) : '1,433'}
+                onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ cppBenefit: value || 1433 }))}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Default is maximum payable amount. If you know your expected CPP benefits, please enter that amount instead.
+            </p>
             <button 
               className="text-accent text-sm mt-2 flex items-center gap-1 hover:text-primary-500 transition-colors"
               onClick={() => toggleLearnMore('cpp')}
@@ -446,14 +471,19 @@ const CurrentSavingsStep = ({ formData, updateFormData, onNext, onPrev }) => {
         <div>
           <label className="block">
             <p className="text-foreground text-base font-medium mb-2">Old Age Security (OAS) - Monthly</p>
-            <input
-              type="number"
-              placeholder="$727.67"
-              className="w-full bg-white border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm"
-              value={formData.oasBenefit || 727.67}
-              onChange={(e) => updateFormData({ oasBenefit: parseFloat(e.target.value) || 727.67 })}
-              min="0"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+              <input
+                type="text"
+                placeholder="727.67"
+                className="w-full bg-white border border-border rounded-lg pl-7 pr-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                value={formData.oasBenefit ? formatNumberWithCommas(formData.oasBenefit.toString()) : '727.67'}
+                onChange={(e) => handleCurrencyInput(e.target.value, (value) => updateFormData({ oasBenefit: value || 727.67 }))}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Default is maximum payable amount. If you know your expected OAS benefits, please enter that amount instead.
+            </p>
             <button 
               className="text-accent text-sm mt-2 flex items-center gap-1 hover:text-primary-500 transition-colors"
               onClick={() => toggleLearnMore('oas')}

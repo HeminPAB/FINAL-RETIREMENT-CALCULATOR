@@ -1,7 +1,8 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
-export const generateRetirementReport = (formData, calculations) => {
+export const generateRetirementReport = async (formData, calculations) => {
+  // Dynamic imports to ensure client-side only execution
+  const { default: jsPDF } = await import('jspdf');
+  const { default: autoTable } = await import('jspdf-autotable');
+  
   const doc = new jsPDF();
   
   // Helper function to format currency
